@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllUsers = exports.getAuthenticatedUser = exports.googleSignup = void 0;
+exports.updateUser = exports.getAllUsers = exports.getAuthenticatedUser = exports.googleSignup = void 0;
 const client_1 = require("@prisma/client");
 const jwt_1 = require("../utils/jwt");
 const google_auth_1 = require("../utils/google-auth");
@@ -85,3 +85,20 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.getAllUsers = getAllUsers;
+const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const { username, email } = req.body;
+        // Only allow updating username and email for now
+        const updatedUser = yield prisma.user.update({
+            where: { userId: Number(userId) },
+            data: Object.assign(Object.assign({}, (username && { username })), (email && { email })),
+        });
+        res.status(200).json(updatedUser);
+    }
+    catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ message: 'Failed to update user', error: error.message });
+    }
+});
+exports.updateUser = updateUser;

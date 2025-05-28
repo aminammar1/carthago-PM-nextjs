@@ -89,3 +89,22 @@ export const getAllUsers = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error retrieving users" });
   }
 }
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { username, email } = req.body;
+    // Only allow updating username and email for now
+    const updatedUser = await prisma.user.update({
+      where: { userId: Number(userId) },
+      data: {
+        ...(username && { username }),
+        ...(email && { email }),
+      },
+    });
+    res.status(200).json(updatedUser);
+  } catch (error: any) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: 'Failed to update user', error: error.message });
+  }
+};
